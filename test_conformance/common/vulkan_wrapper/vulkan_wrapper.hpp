@@ -588,6 +588,7 @@ public:
         VulkanExternalSemaphoreHandleType externalSemaphoreHandleType =
             VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_NONE,
         const std::wstring name = L"");
+    const VulkanDevice &getDevice() const;
     virtual ~VulkanSemaphore();
 #ifdef _WIN32
     HANDLE getHandle(
