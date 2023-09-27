@@ -239,34 +239,46 @@ getSupportedVulkanExternalMemoryHandleTypeList()
 const std::vector<VulkanExternalSemaphoreHandleType>
 getSupportedVulkanExternalSemaphoreHandleTypeList(const VulkanDevice &vkDevice)
 {
-    typedef struct  {
+    typedef struct
+    {
         VkExternalSemaphoreHandleTypeFlagBits vk_type;
         VulkanExternalSemaphoreHandleType enum_type;
-    }VkSemaphoreHandleMap;
+    } VkSemaphoreHandleMap;
 
     const VkSemaphoreHandleMap all_known_handle_types[] = {
-            {VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR, VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD},
-            {VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR, VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT},
-            {VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT_KHR, VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT},
-            {VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR, VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT_KMT},
-            {VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT_KHR, VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT_KMT},
-            {VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR, VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD}
+        { VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+          VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD },
+        { VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR,
+          VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT },
+        { VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT_KHR,
+          VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT },
+        { VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR,
+          VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT_KMT },
+        { VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT_KHR,
+          VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT_KMT },
+        { VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR,
+          VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD }
     };
-    const int num_types = sizeof(all_known_handle_types)/ sizeof(VkSemaphoreHandleMap);
+    const int num_types =
+        sizeof(all_known_handle_types) / sizeof(VkSemaphoreHandleMap);
     std::vector<VulkanExternalSemaphoreHandleType>
         externalSemaphoreHandleTypeList;
 
-    for(int i = 0; i < num_types; i++) {
+    for (int i = 0; i < num_types; i++)
+    {
         VkPhysicalDeviceExternalSemaphoreInfo handle_query = {
-                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_SEMAPHORE_INFO,
-                nullptr,
-                all_known_handle_types[i].vk_type
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_SEMAPHORE_INFO, nullptr,
+            all_known_handle_types[i].vk_type
         };
         VkExternalSemaphoreProperties query_result = {};
-        vkGetPhysicalDeviceExternalSemaphorePropertiesKHR(vkDevice.getPhysicalDevice(), &handle_query, &query_result);
-        if(query_result.externalSemaphoreFeatures & (VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT_KHR | VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT_KHR )) {
+        vkGetPhysicalDeviceExternalSemaphorePropertiesKHR(
+            vkDevice.getPhysicalDevice(), &handle_query, &query_result);
+        if (query_result.externalSemaphoreFeatures
+            & (VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT_KHR
+               | VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT_KHR))
+        {
             externalSemaphoreHandleTypeList.push_back(
-                    all_known_handle_types[i].enum_type);
+                all_known_handle_types[i].enum_type);
         }
     }
 
@@ -274,34 +286,48 @@ getSupportedVulkanExternalSemaphoreHandleTypeList(const VulkanDevice &vkDevice)
 }
 
 std::vector<VulkanExternalSemaphoreHandleType>
-getSupportedInteropExternalSemaphoreHandleTypes(cl_device_id device, VulkanDevice &vkDevice)
+getSupportedInteropExternalSemaphoreHandleTypes(cl_device_id device,
+                                                VulkanDevice &vkDevice)
 {
     const std::vector<VulkanExternalSemaphoreHandleType>
-            supportedVkSemaphoreTypes = getSupportedVulkanExternalSemaphoreHandleTypeList(vkDevice);
+        supportedVkSemaphoreTypes =
+            getSupportedVulkanExternalSemaphoreHandleTypeList(vkDevice);
     std::vector<VulkanExternalSemaphoreHandleType> supportedSemaphoreTypes;
 
-    if( is_extension_available(device, "cl_khr_external_semaphore_opaque_fd")  &&
-        std::count(supportedVkSemaphoreTypes.begin(), supportedVkSemaphoreTypes.end(), VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD))
+    if (is_extension_available(device, "cl_khr_external_semaphore_opaque_fd")
+        && std::count(supportedVkSemaphoreTypes.begin(),
+                      supportedVkSemaphoreTypes.end(),
+                      VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD))
     {
-        supportedSemaphoreTypes.push_back(VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD);
+        supportedSemaphoreTypes.push_back(
+            VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD);
     }
 
-    if(is_extension_available(device, "cl_khr_external_semaphore_sync_fd") &&
-       std::count(supportedVkSemaphoreTypes.begin(), supportedVkSemaphoreTypes.end(), VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD))
+    if (is_extension_available(device, "cl_khr_external_semaphore_sync_fd")
+        && std::count(supportedVkSemaphoreTypes.begin(),
+                      supportedVkSemaphoreTypes.end(),
+                      VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD))
     {
-        supportedSemaphoreTypes.push_back(VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD);
+        supportedSemaphoreTypes.push_back(
+            VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD);
     }
 
-    if(is_extension_available(device, "cl_khr_external_semaphore_win32") &&
-       std::count(supportedVkSemaphoreTypes.begin(), supportedVkSemaphoreTypes.end(), VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT))
+    if (is_extension_available(device, "cl_khr_external_semaphore_win32")
+        && std::count(supportedVkSemaphoreTypes.begin(),
+                      supportedVkSemaphoreTypes.end(),
+                      VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT))
     {
-        supportedSemaphoreTypes.push_back(VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT);
+        supportedSemaphoreTypes.push_back(
+            VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_NT);
     }
 
-    if(is_extension_available(device, "cl_khr_external_semaphore_win32") &&
-       std::count(supportedVkSemaphoreTypes.begin(), supportedVkSemaphoreTypes.end(), VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT))
+    if (is_extension_available(device, "cl_khr_external_semaphore_win32")
+        && std::count(supportedVkSemaphoreTypes.begin(),
+                      supportedVkSemaphoreTypes.end(),
+                      VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT))
     {
-        supportedSemaphoreTypes.push_back(VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT);
+        supportedSemaphoreTypes.push_back(
+            VULKAN_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT);
     }
 
     return supportedSemaphoreTypes;

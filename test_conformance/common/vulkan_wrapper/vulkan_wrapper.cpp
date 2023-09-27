@@ -2256,10 +2256,7 @@ VulkanSemaphore::VulkanSemaphore(
     vkCreateSemaphore(m_device, &vkSemaphoreCreateInfo, NULL, &m_vkSemaphore);
 }
 
-const VulkanDevice &VulkanSemaphore::getDevice() const
-{
-    return m_device;
-}
+const VulkanDevice &VulkanSemaphore::getDevice() const { return m_device; }
 
 VulkanSemaphore::~VulkanSemaphore()
 {
@@ -2313,11 +2310,11 @@ int VulkanSemaphore::getHandle(
 
         VkSemaphoreGetFdInfoKHR vkSemaphoreGetFdInfoKHR = {};
         vkSemaphoreGetFdInfoKHR.sType =
-                VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
+            VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
         vkSemaphoreGetFdInfoKHR.pNext = NULL;
         vkSemaphoreGetFdInfoKHR.semaphore = m_vkSemaphore;
         vkSemaphoreGetFdInfoKHR.handleType =
-                VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR;
+            VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR;
 
         vkGetSemaphoreFdKHR(m_device, &vkSemaphoreGetFdInfoKHR, &fd);
 
